@@ -1,7 +1,4 @@
-elpa/
-server/
-quelpa/
-auto-save-list/
-recentf
-*~
-network-security.data
+*
+
+!.gitignore
+!init.el

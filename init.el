@@ -1,21 +1,46 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                          ;;
 ;; Setting up basic configs ;;
 ;;                          ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (setq inhibit-startup-message t)
+
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 (defalias 'yes-or-no-p 'y-or-n-p)
-(set-frame-font "Cascadia Code-12" nil t)
-(setq default-frame-alist '((font . "Cascadia Code-18")))
+(defvar nog-font-size 16)
+(defvar nog-preferred-font "Iosevka")
+
+(defvar nog-font (concat nog-preferred-font "-" (number-to-string nog-font-size)))
+
+(defun font-exists-p (font)
+  "Check if font exists"
+  (if (null (x-list-fonts font)) nil t))
+
+(unless (not (font-exists-p nog-font))
+  (set-frame-font nog-font nil t)
+  (setq default-frame-alist (list (cons 'font nog-font))))
+
+(unless (font-exists-p nog-font)
+  (if (eq system-type 'darwin)
+      ; for OS X if true
+      (let ((system-font (concat "Menlo-" (number-to-string nog-font-size))))
+	(set-frame-font system-font nil t)
+	(setq default-frame-alist '((font . system-font))))
+      ; else
+      (let ((system-font (concat "Consolas-" (number-to-string nog-font-size))))
+	(set-frame-font system-font nil t)
+	(setq default-frame-alist '((font . system-font))))
+  ))
+
 (global-display-line-numbers-mode t)
-(setq exec-path (append exec-path '("/Users/nog/.nvm/versions/node/v16.4.0/bin/")))
+(setq exec-path (append exec-path '("/Users/nog/.nvm/versions/node/v16.4.0/bin/" "/opt/homebrew/bin/")))
 (add-to-list 'default-frame-alist '(height . 28)) ;; Vertical frame size
 (add-to-list 'default-frame-alist '(width . 82)) ;; Horizontal frame size
 (require 'subr-x)
+(require 'ansi-color)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                            ;;
@@ -80,7 +105,15 @@
   (setq evil-want-C-u-scroll t)
   :config
   (add-to-list 'evil-emacs-state-modes 'nav-mode)
+  (evil-add-command-properties #'nog-shell-command-output-to-buffer :jump t)
   (evil-mode))
+
+(use-package org
+  :config
+  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
+  (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((dot . t)))) ; this line activates dot
 
 (use-package doom-themes
   :config
@@ -100,7 +133,7 @@
   (doom-themes-org-config))
 
 (use-package doom-modeline
-  :init (doom-modeline-mode 1))
+  :config (doom-modeline-mode 1))
 
 (use-package ivy
   :config
@@ -138,40 +171,107 @@
   (setq neo-theme 'arrow)
   (setq neo-smart-open t)
   (setq neo-window-fixed-size nil)
+  (defun not-internal-buffer (buffer)
+    (let ((bufname (string-trim (buffer-name buffer))))
+      (cond
+       ((equal bufname "*scratch*") nil)
+       ((equal bufname "*Backtrace*") nil)
+       ((equal bufname "*Messages*") nil)
+       ((equal bufname "*Buffer List*") nil)
+       ((equal bufname "*terminal*") nil)
+       ((equal bufname "*tide-server*") nil)
+       ((equal bufname "*quelpa-build-checkout*") nil)
+       ((equal bufname "*code-conversion-work*") nil)
+       ((equal bufname "*Echo Area 0*") nil)
+       ((equal bufname "*Echo Area 1*") nil)
+       ((equal bufname "*which-key*") nil)
+       ((equal bufname "*Help*") nil)
+       ((equal bufname "*Minibuf-0*") nil)
+       ((equal bufname "*Minibuf-1*") nil)
+       ((equal bufname "*Minibuf-2*") nil)
+       ((equal bufname "*NeoTree*") nil)
+       (t t))))
+    (defun centaur-tabs-buffer-groups ()
+      "`centaur-tabs-buffer-groups' control buffers' group rules.
+
+    Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
+    All buffer name start with * will group to \"Emacs\".
+    Other buffer group by `centaur-tabs-get-group-name' with project name."
+      (list
+	(cond
+	 ((or (string-equal "*" (substring (buffer-name) 0 1))
+	      (memq major-mode '(magit-process-mode
+				 magit-status-mode
+				 magit-diff-mode
+				 magit-log-mode
+				 magit-file-mode
+				 magit-blob-mode
+				 magit-blame-mode
+				 )))
+	  "Emacs")
+	 ((derived-mode-p 'prog-mode)
+	  "Editing")
+	 ((derived-mode-p 'dired-mode)
+	  "Dired")
+	 ((memq major-mode '(helpful-mode
+			     help-mode))
+	  "Help")
+	 ((memq major-mode '(org-mode
+			     org-agenda-clockreport-mode
+			     org-src-mode
+			     org-agenda-mode
+			     org-beamer-mode
+			     org-indent-mode
+			     org-bullets-mode
+			     org-cdlatex-mode
+			     org-agenda-log-mode
+			     diary-mode))
+	  "OrgMode")
+	 (t
+	  (seq-filter (lambda (element) (not-internal-buffer element)) (buffer-list))))))
 )
 
 (use-package find-file-in-project)
 
-(use-package rust-mode)
-(use-package racer)
-(use-package company)
-(use-package cargo
-  :config
-  (add-hook 'rust-mode-hook 'cargo-minor-mode))
-(use-package flycheck-rust)
-(with-eval-after-load 'rust-mode
-  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
-(use-package tide
-  :config
-  (progn
-    ;; aligns annotation to the right hand side
-    (setq company-tooltip-align-annotations t)
-    ;; formats the buffer before saving
-    (add-hook 'before-save-hook 'tide-format-before-save)
-    (add-hook 'typescript-mode-hook #'setup-tide-mode))
-)
-
-(use-package good-scroll
-  :quelpa (good-scroll :fetcher github :repo "io12/good-scroll.el")
-  :config
-  (good-scroll-mode 1)
-)
+(unless (eq system-type 'darwin)
+  (use-package good-scroll
+    :quelpa (good-scroll :fetcher github :repo "io12/good-scroll.el")
+    :config
+    (good-scroll-mode 1)))
 
 (use-package centaur-tabs
   :demand
   :config
   (centaur-tabs-mode t)
   (setq centaur-tabs-set-icons t))
+
+(defun setup-tide-mode ()
+  "Set up Tide mode."
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save-mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  (company-mode +1))
+
+(use-package tide
+  :config
+  (setq company-tooltip-align-annotations t)
+  (add-hook 'before-save-hook 'tide-format-before-save)
+  (add-hook 'typescript-mode-hook #'setup-tide-mode))
+
+(use-package ob-mermaid
+  :config
+  (setq ob-mermaid-cli-path "/opt/homebrew/Cellar/mermaid-cli/8.11.0/bin/mmdc"))
+
+(use-package better-jumper
+  :requires evil
+  :config
+  (better-jumper-mode +1)
+  (with-eval-after-load 'evil-maps
+    (define-key evil-motion-state-map (kbd "C-o") 'better-jumper-jump-backward)
+    (define-key evil-motion-state-map (kbd "<C-i>") 'better-jumper-jump-forward)))
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;;                  ;;
@@ -237,6 +337,21 @@
       (insert (concat prefix (shell-command-to-string command)))
     (insert (shell-command-to-string command))))
 
+(defun nog-display-ansi-colors ()
+  (interactive)
+  (ansi-color-apply-on-region (point-min) (point-max)))
+
+(defun nog-shell-command-output-to-buffer (command)
+  "Same as nog-insert-shell-command-output but to a temp buffer instead"
+  (interactive)
+  (pop-to-buffer (get-buffer-create "*Shell Command Output*"))
+  (erase-buffer)
+  (insert (shell-command-to-string command))
+  (beginning-of-buffer)
+  (nog-display-ansi-colors))
+
+(add-hook 'nog-shell-command-output-to-buffer 'nog-rename-shell-buffer)
+
 (defun nog-run-file-through-command ()
   "Get current filename format, based on that format choose which command to run
   (output will be inserted 2 lines below, with provided prefix, if non-nil)"
@@ -246,6 +361,7 @@
        )
     (cond
      ((equal format "lisp") (nog-insert-shell-command-output (concat "sbcl --script " (buffer-file-name)) ";; "))
+     ((equal format "ts") (nog-shell-command-output-to-buffer (concat "deno run --allow-read --quiet " (buffer-file-name))))
      (t (message (concat "Can't run program for current file! Unknown format: " format)))
     )
   )
@@ -273,6 +389,9 @@
 				(other-window -1)))
 (global-set-key (kbd "C-c h") 'company-complete)
 (global-set-key (kbd "C-c b") 'ivy-switch-buffer)
+(global-set-key [C-kp-add] 'text-scale-increase)
+(global-set-key [C-kp-subtract] 'text-scale-decrease)
+
 
 (evil-define-key 'normal neotree-mode-map (kbd "TAB") 'neotree-enter)
 (evil-define-key 'normal neotree-mode-map (kbd "SPC") 'neotree-quick-look)
@@ -300,8 +419,10 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(column-number-mode t)
+ '(custom-safe-themes
+   '("0d01e1e300fcafa34ba35d5cf0a21b3b23bc4053d388e352ae6a901994597ab1" default))
  '(package-selected-packages
-   '(slime centaur-tabs good-scroll doom-modeline quelpa-use-package quelpa doom-themes one-themes tide find-file-in-project all-the-icons flycheck-rust cargo racer rust-mode neotree smartparens which-key flycheck company ivy evil use-package)))
+   '(better-jumper ob-mermaid lsp-treemacs lsp-ivy lsp-ui lsp-mode slime centaur-tabs good-scroll doom-modeline quelpa-use-package quelpa doom-themes one-themes tide find-file-in-project all-the-icons flycheck-rust cargo racer rust-mode neotree smartparens which-key flycheck company ivy evil use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
