@@ -1,0 +1,27 @@
+;;; nog-package-tide.el --- tide
+;;;
+;;; Commentary:
+;;
+;; sets up tide
+;;
+;;; Code:
+
+(defun setup-tide-mode ()
+  "Set up Tide mode."
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save-mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  (company-mode +1))
+
+(use-package tide
+  :config
+  (setq company-tooltip-align-annotations t)
+  (add-hook 'before-save-hook 'tide-format-before-save)
+  (add-hook 'typescript-mode-hook #'setup-tide-mode))
+
+(provide 'nog-package-tide)
+
+;;; nog-package-tide.el ends here
