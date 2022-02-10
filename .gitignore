@@ -2,3 +2,6 @@
 
 !.gitignore
 !init.el
+
+!packages/**/*.el
+!base-setup/**/*.el
