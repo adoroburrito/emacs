@@ -95,58 +95,41 @@
   )
 )
 
-;; Quick help (got the idea from https://www.olivertaylor.net/emacs/quick-help.html)
-(defmacro quick-help (name buffer text)
-  "Macro for creating callable functions that display help.
-Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed."
-  (declare (indent defun))
-  `(progn
-     (defun ,name nil
-       ,buffer
-       (interactive)
-       (let ((qh-buff (concat "*Quick Help: " ,buffer "*"))
-             (qh-text ,text))
-         (get-buffer-create qh-buff)
-         (with-current-buffer qh-buff
-           (insert qh-text)
-           (goto-char (point-min))
-           (not-modified)
-           (read-only-mode)
-           (local-set-key (kbd "C-g") (lambda () (interactive) (other-window -1)))
-           (local-set-key (kbd "q") 'kill-buffer-and-window))
-         (pop-to-buffer qh-buff '((display-buffer-below-selected)
-                                  (window-parameters . ((no-other-window . nil)))
-                                  (window-height . fit-window-to-buffer)))
-         (message "C-g - Previous Window, q - Remove Window")))))
+(defun nog-add-folder-as-project (folder-path project-name)
+  "Add folder path to an internal file that tracks known projects"
+  (interactive
+   (list
+    (read-string "Folder path (empty for current folder):")
+    (read-string "Project name (required):")))
+  (let ((function-prefix "[nog-add-folder-as-project] "))
+    (message (concat function-prefix "Provided folder path: " folder-path " | Provided project name: " project-name))
+    (if (= (length project-name) 0)
+	(message (concat function-prefix "No project name provided!")))
+    (unless (= (length project-name) 0)
+      (if (= (length folder-path) 0)
+          (write-region (concat (file-name-directory buffer-file-name) "|||" project-name "\n") nil (concat user-emacs-directory "known-projects.nog") 'append)
+        (write-region (concat folder-path "|||" project-name "\n") nil (concat user-emacs-directory "known-projects.nog") 'append)))))
 
-(quick-help qh--it-hotline
-  "IT Hotline"
-  "IT HOTLINE: 855-555-5555")
-
-(quick-help qh--departments
-  "Departments"
-  "\
-| Department | Manager     | Extension | Time Zone |
-|------------+-------------+-----------+-----------|
-| Sales      | Dave F      |        16 | LA        |
-| IT         | Sydney R    |       198 | NY        |
-| Support    | Ellie T     |        29 | DEN       |
-| Shipping   | Shaun D     |       345 | ATL       |
-| Recieving  | Brian C     |       876 | NY        |
-| Marketing  | Elizabeth W |        12 | LA        |
-| Coffee     | Donna F     |        34 | NY        |")
-
-(quick-help qh--wheather
-  "Weather Whether Wether"
-  "The climate is made up of “WEATHER”;
-WHETHER it is nice out depends on whether it is raining or not.
-A WETHER is just a castrated sheep.")
-
-(define-prefix-command 'quick-help-prompt nil "Quick Help")
-
-(let ((map quick-help-prompt))
-  (define-key map "i" '("IT Hotline" . qh--it-hotline))
-  (define-key map "d" '("Departments" . qh--departments))
-  (define-key map "w" '("Weather Whether Wether" . qh--wheather)))
+;; this function needs improvement, it is not showing the project name
+(defun nog-list-projects ()
+  "List all projects that are known (in file ~/.emacs.d/known-projects.nog)"
+  (interactive)
+  (setq nog-available-projects '())
+  (with-temp-buffer
+    (insert-file-contents-literally "~/.emacs.d/known-projects.nog")
+    (while (not (eobp))
+      (let* (
+	     (line
+	      (buffer-substring-no-properties
+	       (line-beginning-position)
+	       (line-end-position)))
+	     (line-to-list (split-string line "|||"))
+	     (project-path (nth 0 line-to-list))
+	     (project-name (nth 1 line-to-list))
+	    )
+	(message (concat "Project path is '" project-path "' and name is '" project-name "'"))
+	(add-to-list 'nog-available-projects (cons project-path  project-name))
+	(forward-line 1)))
+    (find-file (completing-read "Choose: " nog-available-projects))))
 
 ;;; nog-functions.el ends here

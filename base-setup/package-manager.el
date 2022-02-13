@@ -42,6 +42,7 @@
 (add-to-list 'load-path (expand-file-name "packages" user-emacs-directory))
 
 (require 'nog-package-evil)
+(require 'nog-package-undo-tree)
 (require 'nog-package-org)
 (require 'nog-package-doom-themes)
 (require 'nog-package-doom-modeline)
@@ -57,6 +58,6 @@
 (require 'nog-package-tide)
 (require 'nog-package-ob-mermaid)
 (require 'nog-package-better-jumper)
-
+(require 'nog-package-fzf)
 
 ;;; package-manager.el ends here

@@ -20,9 +20,10 @@
 (global-display-line-numbers-mode t)
 (add-to-list 'default-frame-alist '(height . 28)) ;; Vertical frame size
 (add-to-list 'default-frame-alist '(width . 82)) ;; Horizontal frame size
+(setq make-backup-files nil) ;; disable backup files (*~, #*)
 
 ;; font configs
-(defvar nog-font-size 16)
+(defvar nog-font-size 20)
 (defvar nog-preferred-font "Iosevka")
 (defvar nog-font (concat nog-preferred-font "-" (number-to-string nog-font-size)))
 
