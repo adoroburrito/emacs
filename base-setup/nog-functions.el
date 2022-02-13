@@ -110,7 +110,6 @@
           (write-region (concat (file-name-directory buffer-file-name) "|||" project-name "\n") nil (concat user-emacs-directory "known-projects.nog") 'append)
         (write-region (concat folder-path "|||" project-name "\n") nil (concat user-emacs-directory "known-projects.nog") 'append)))))
 
-;; this function needs improvement, it is not showing the project name
 (defun nog-list-projects ()
   "List all projects that are known (in file ~/.emacs.d/known-projects.nog)"
   (interactive)
@@ -128,8 +127,13 @@
 	     (project-name (nth 1 line-to-list))
 	    )
 	(message (concat "Project path is '" project-path "' and name is '" project-name "'"))
-	(add-to-list 'nog-available-projects (cons project-path  project-name))
+	(add-to-list 'nog-available-projects (cons project-name  project-path))
 	(forward-line 1)))
-    (find-file (completing-read "Choose: " nog-available-projects))))
+    (find-file (alist-get
+		(completing-read "Choose: " nog-available-projects)
+		nog-available-projects
+		nil
+		nil
+		'equal))))
 
 ;;; nog-functions.el ends here
