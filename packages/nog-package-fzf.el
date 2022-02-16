@@ -24,11 +24,19 @@
       (global-set-key (kbd "C-c p") 'fzf-git-files)
       (global-set-key (kbd "C-c a") 'fzf))))
 
-(if (eq system-type 'darwin)
-    (nog-package-fzf-mac)
-  (progn
-    (message (concat "Can't install fzf for system: " system-type ". Check file '.emacs.d/packages/nog-package-fzf.el'"))
-    (nog-package-fzf-unknown)))
+(defun nog-package-fzf-windows ()
+  (message "Trying to setup fzf package for: windows")
+  (if (not (executable-find "fzf"))
+      (message "Failed to setup fzf for windows: fzf binary not found!")
+    (use-package fzf
+      :config
+      (global-set-key (kbd "C-c p") 'fzf-git-files)
+      (global-set-key (kbd "C-c a") 'fzf))))
+
+(cond 
+  ((eq system-type 'darwin) (nog-package-fzf-mac))
+  ((eq system-type 'windows-nt) (nog-package-fzf-windows))
+  (t (nog-package-fzf-unknown)))
 
 (provide 'nog-package-fzf)
 

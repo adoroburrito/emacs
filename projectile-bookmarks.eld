@@ -1,1 +1,0 @@
-("~/fun/nfeapp/serverless-api/" "~/fun/")

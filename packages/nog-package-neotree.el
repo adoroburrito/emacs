@@ -14,6 +14,7 @@
   (setq neo-theme 'arrow)
   (setq neo-smart-open t)
   (setq neo-window-fixed-size nil)
+  (setq-default neo-show-hidden-files t)
   (defun not-internal-buffer (buffer)
     (let ((bufname (string-trim (buffer-name buffer))))
       (cond

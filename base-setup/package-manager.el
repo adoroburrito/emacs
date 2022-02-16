@@ -41,20 +41,26 @@
 ;; start importing packages mercilessly
 (add-to-list 'load-path (expand-file-name "packages" user-emacs-directory))
 
+;; critical to the workflow
 (require 'nog-package-evil)
 (require 'nog-package-undo-tree)
 (require 'nog-package-org)
-(require 'nog-package-doom-themes)
-(require 'nog-package-doom-modeline)
 (require 'nog-package-ivy)
 (require 'nog-package-company)
-(require 'nog-package-flycheck)
 (require 'nog-package-which-key)
 (require 'nog-package-smartparens)
 (require 'nog-package-neotree)
+(require 'nog-package-all-the-icons)
 (require 'nog-package-ffip)
-(require 'nog-package-good-scroll)
 (require 'nog-package-centaur-tabs)
+
+;; UI customization 
+(require 'nog-package-doom-themes)
+(require 'nog-package-doom-modeline)
+(require 'nog-package-good-scroll)
+
+;; everything else
+(require 'nog-package-flycheck)
 (require 'nog-package-tide)
 (require 'nog-package-ob-mermaid)
 (require 'nog-package-better-jumper)
