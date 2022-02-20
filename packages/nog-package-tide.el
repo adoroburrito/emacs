@@ -17,10 +17,12 @@
   (company-mode +1))
 
 (use-package tide
+  :after (typescript-mode company flycheck)
+  :hook ((typescript-mode . tide-setup)
+	 (typescript-mode . tide-hl-identifier-mode)
+	 (before-save . tide-format-before-save))
   :config
-  (setq company-tooltip-align-annotations t)
-  (add-hook 'before-save-hook 'tide-format-before-save)
-  (add-hook 'typescript-mode-hook #'setup-tide-mode))
+  (setq company-tooltip-align-annotations t))
 
 (provide 'nog-package-tide)
 

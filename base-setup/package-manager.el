@@ -5,7 +5,7 @@
 ;; This file is meant to setup use package and load all packages
 ;;
 ;;; Code:
-
+  
 (require 'package)
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
@@ -41,29 +41,53 @@
 ;; start importing packages mercilessly
 (add-to-list 'load-path (expand-file-name "packages" user-emacs-directory))
 
-;; critical to the workflow
-(require 'nog-package-evil)
-(require 'nog-package-undo-tree)
-(require 'nog-package-org)
-(require 'nog-package-ivy)
-(require 'nog-package-company)
-(require 'nog-package-which-key)
-(require 'nog-package-smartparens)
-(require 'nog-package-neotree)
-(require 'nog-package-all-the-icons)
-(require 'nog-package-ffip)
-(require 'nog-package-centaur-tabs)
+(defvar missing-packages-list nil
+  "List of packages that `try-require' can't find.")
+
+(defun try-require (feature)
+  "Attempt to load a library or module. Return true if the
+library given as argument is successfully loaded. If not, instead
+of an error, just add the package to a list of missing packages."
+  (condition-case err
+      ;; protected form
+      (progn
+        (message "[Package manager] Checking for library `%s'..." feature)
+        (if (stringp feature)
+            (load-library feature)
+          (require feature))
+        (message "[Package manager] Checking for library `%s'... Found" feature))
+    ;; error handler
+    (file-error  ; condition
+     (progn
+       (message "[Package manager] Checking for library `%s'... Missing" feature)
+       (add-to-list 'missing-packages-list feature))
+     nil)))
+
+;; basics
+(try-require 'nog-package-evil)
+(try-require 'nog-package-undo-tree)
+(try-require 'nog-package-ivy)
+(try-require 'nog-package-company)
+(try-require 'nog-package-which-key)
+(try-require 'nog-package-smartparens)
+(try-require 'nog-package-neotree)
+(try-require 'nog-package-all-the-icons)
+(try-require 'nog-package-ffip)
+(try-require 'nog-package-centaur-tabs)
 
 ;; UI customization 
-(require 'nog-package-doom-themes)
-(require 'nog-package-doom-modeline)
-(require 'nog-package-good-scroll)
+(try-require 'nog-package-doom-themes)
+(try-require 'nog-package-doom-modeline)
+(try-require 'nog-package-good-scroll)
 
 ;; everything else
-(require 'nog-package-flycheck)
-(require 'nog-package-tide)
-(require 'nog-package-ob-mermaid)
-(require 'nog-package-better-jumper)
-(require 'nog-package-fzf)
+(try-require 'nog-package-flycheck)
+(try-require 'nog-package-tide)
+(try-require 'nog-package-fzf)
+
+;;org stuff
+(try-require 'nog-package-ob-mermaid)
+(try-require 'nog-package-ob-typescript)
+(try-require 'nog-package-org)
 
 ;;; package-manager.el ends here

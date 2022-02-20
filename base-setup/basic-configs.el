@@ -26,7 +26,7 @@
 (global-auto-revert-mode t)
 
 ;; font configs
-(defvar nog-font-size 14)
+(defvar nog-font-size 12)
 (defvar nog-preferred-font "Iosevka")
 (defvar nog-font (concat nog-preferred-font "-" (number-to-string nog-font-size)))
 
