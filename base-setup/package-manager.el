@@ -84,6 +84,7 @@ of an error, just add the package to a list of missing packages."
 (try-require 'nog-package-flycheck)
 (try-require 'nog-package-tide)
 (try-require 'nog-package-fzf)
+(try-require 'nog-package-posframe)
 
 ;;org stuff
 (try-require 'nog-package-ob-mermaid)

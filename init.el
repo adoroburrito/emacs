@@ -42,7 +42,7 @@
  '(custom-safe-themes
    '("0d01e1e300fcafa34ba35d5cf0a21b3b23bc4053d388e352ae6a901994597ab1" default))
  '(package-selected-packages
-   '(fzf better-jumper ob-mermaid lsp-treemacs lsp-ivy lsp-ui lsp-mode slime centaur-tabs good-scroll doom-modeline quelpa-use-package quelpa doom-themes one-themes tide find-file-in-project all-the-icons flycheck-rust cargo racer rust-mode neotree smartparens which-key flycheck company ivy evil use-package)))
+   '(flycheck-posframe posframe magit fzf better-jumper ob-mermaid lsp-treemacs lsp-ivy lsp-ui lsp-mode slime centaur-tabs good-scroll doom-modeline quelpa-use-package quelpa doom-themes one-themes tide find-file-in-project all-the-icons flycheck-rust cargo racer rust-mode neotree smartparens which-key flycheck company ivy evil use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

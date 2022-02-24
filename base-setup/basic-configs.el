@@ -22,6 +22,12 @@
 (add-to-list 'default-frame-alist '(width . 82)) ;; Horizontal frame size
 (setq make-backup-files nil) ;; disable backup files (*~, #*)
 
+;; enforce unix style for EVERYTHANG
+(setq-default buffer-file-coding-system 'utf-8-unix)
+(setq-default default-buffer-file-coding-system 'utf-8-unix)
+(set-default-coding-systems 'utf-8-unix)
+(prefer-coding-system 'utf-8-unix)
+
 ;; auto refresh files
 (global-auto-revert-mode t)
 

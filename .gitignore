@@ -49,4 +49,6 @@ flycheck_*.el
 /network-security.data
 
 # recentf
-recentf
+recentftransient/
+
+transient/
