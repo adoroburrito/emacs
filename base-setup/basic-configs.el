@@ -8,19 +8,24 @@
 ;;; Code:
 
 ;; requiring modules we will need later
+
 (require 'subr-x)
 (require 'ansi-color)
 
 ;; basic default options
 (setq inhibit-startup-message t)
-(tool-bar-mode -1)
-(menu-bar-mode -1)
-(scroll-bar-mode -1)
 (defalias 'yes-or-no-p 'y-or-n-p)
 (global-display-line-numbers-mode t)
 (add-to-list 'default-frame-alist '(height . 28)) ;; Vertical frame size
 (add-to-list 'default-frame-alist '(width . 82)) ;; Horizontal frame size
 (setq make-backup-files nil) ;; disable backup files (*~, #*)
+(when window-system 
+	(tool-bar-mode -1)
+	(menu-bar-mode -1)
+	(scroll-bar-mode -1)
+	(add-to-list 'default-frame-alist '(height . 28)) ;; Vertical frame size
+	(add-to-list 'default-frame-alist '(width . 82))) ;; Horizontal frame size
+
 
 ;; enforce unix style for EVERYTHANG
 (setq-default buffer-file-coding-system 'utf-8-unix)
@@ -28,12 +33,18 @@
 (set-default-coding-systems 'utf-8-unix)
 (prefer-coding-system 'utf-8-unix)
 
+;; use 2 spaces instead of tabs
+(setq-default indent-tabs-mode nil)
+(setq tab-width 2)
+(setq indent-line-function 'insert-tab)
+(setq typescript-indent-level 2)
+
 ;; auto refresh files
 (global-auto-revert-mode t)
 
 ;; font configs
-(defvar nog-font-size 12)
-(defvar nog-preferred-font "Iosevka")
+(defvar nog-font-size 18)
+(defvar nog-preferred-font "Iosevka Term")
 (defvar nog-font (concat nog-preferred-font "-" (number-to-string nog-font-size)))
 
 (defun font-exists-p (font)
@@ -41,9 +52,10 @@
   (if (null (x-list-fonts font)) nil t))
 
 ;; if the font exists, use it
-(unless (not (font-exists-p nog-font))
-  (set-frame-font nog-font nil t)
-  (setq default-frame-alist (list (cons 'font nog-font))))
+(when window-system 
+	(unless (not (font-exists-p nog-font))
+	  (set-frame-font nog-font nil t)
+	  (setq default-frame-alist (list (cons 'font nog-font)))))
 
 ;; if the font doesn't exists, use fallback fonts, according to the OS
 ;; to-do: fix this

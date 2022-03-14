@@ -3,8 +3,7 @@
 ;;; Commentary:
 ;;
 ;; This file is meant to setup use package and load all packages
-;;
-;;; Code:
+;; ;;; Code:
   
 (require 'package)
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
@@ -85,6 +84,10 @@ of an error, just add the package to a list of missing packages."
 (try-require 'nog-package-tide)
 (try-require 'nog-package-fzf)
 (try-require 'nog-package-posframe)
+(try-require 'nog-package-clojure-mode)
+(try-require 'nog-package-haskell-mode)
+(try-require 'nog-package-sly)
+(try-require 'nog-package-magit)
 
 ;;org stuff
 (try-require 'nog-package-ob-mermaid)

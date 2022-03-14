@@ -10,7 +10,7 @@
   :init
   (setq evil-want-C-u-scroll t)
   :config
-  (add-to-list 'evil-emacs-state-modes 'nav-mode)
+  (add-to-list 'evil-emacs-state-modes 'nav-mode 'sly-mrepl-mode)
   (evil-set-initial-state 'eshell-mode 'emacs)
   (evil-add-command-properties #'nog-shell-command-output-to-buffer :jump t)
   (evil-set-undo-system 'undo-redo)
